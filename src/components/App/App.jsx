@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
-import { ContactForm } from 'components/ContactForm/ContactForm';
+import ContactForm from 'components/ContactForm/ContactForm';
 import { ContactList } from 'components/ContactList/ContactList';
 import { Filter } from 'components/Filter/Filter';
 
@@ -16,7 +16,7 @@ const defaultContacts = [
 
 export const App = () => {
   const [contacts, setContacts] = useLocalStorage('contacts', defaultContacts);
-
+  
   // const [contacts, setContacts] = useState(
   //   JSON.parse(localStorage.getItem('contacts')) ?? [
   //     { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },

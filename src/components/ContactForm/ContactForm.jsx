@@ -1,64 +1,110 @@
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import { nanoid } from 'nanoid';
-import { useState } from 'react';
+// import { useState } from 'react';
 import { PropTypes } from 'prop-types';
+import { useReducer } from 'react';
 import { Form, FormBtn, FormInput, FormLabel } from './ContactForm.styled';
+import { memo } from 'react';
 
-export const ContactForm = ({ onSubmitForm }) => {
-  const [name, setName] = useState('');
-  const [number, setNumber] = useState('');
-  // state = {
-  //   name: '',
-  //   number: '',
-  // };
+const initialState = {
+  name: '',
+  number: '',
+};
+
+function formReducer(state, action) {
+  switch (action.type) {
+    case 'UPDATE_NAME':
+      return { ...state, name: action.payload };
+    case 'UPDATE_NUMBER':
+      return { ...state, number: action.payload };
+    case 'RESET_FORM':
+      return initialState;
+    default:
+      Notify.failure('🐷 Error happened. Please try again');
+      return state;
+  }
+}
+
+const ContactForm = ({ onSubmitForm }) => {
+  const [formState, dispatch] = useReducer(formReducer, initialState);
 
   const handleChange = e => {
     const { name, value } = e.target;
 
     switch (name) {
       case 'name':
-        setName(value);
+        dispatch({ type: 'UPDATE_NAME', payload: value });
         break;
       case 'number':
-        setNumber(value);
+        dispatch({ type: 'UPDATE_NUMBER', payload: value });
         break;
       default:
-        Notify.failure('🐷 Error happened. Please try again');
+        dispatch({ type: 'DEFAULT' });
         break;
     }
   };
-  // handleChange = e => {
-  //   const { name, value } = e.target;
-  //   this.setState({ [name]: value });
-  // };
-
-  //
-  //
-  //
-  //
-  //
 
   const handleSubmit = e => {
     e.preventDefault();
 
-    onSubmitForm({ name, number, id: nanoid() });
-    reset();
+    onSubmitForm({ ...formState, id: nanoid() });
+    dispatch({ type: 'RESET_FORM' });
   };
-  // handleSubmit = e => {
+
+  // const [name, setName] = useState('');
+  // const [number, setNumber] = useState('');
+  // // state = {
+  // //   name: '',
+  // //   number: '',
+  // // };
+
+  // const handleChange = e => {
+  //   const { name, value } = e.target;
+
+  //   switch (name) {
+  //     case 'name':
+  //       setName(value);
+  //       break;
+  //     case 'number':
+  //       setNumber(value);
+  //       break;
+  //     default:
+  //       Notify.failure('🐷 Error happened. Please try again');
+  //       break;
+  //   }
+  // };
+  // // handleChange = e => {
+  // //   const { name, value } = e.target;
+  // //   this.setState({ [name]: value });
+  // // };
+
+  // //
+  // //
+  // //
+  // //
+  // //
+
+  // const handleSubmit = e => {
   //   e.preventDefault();
-  //   this.props.onSubmitForm({ ...this.state, id: nanoid() });
-  //   this.reset();
+
+  //   onSubmitForm({ name, number, id: nanoid() });
+  //   reset();
   // };
-  //
-  //
-  //
-  const reset = () => {
-    setName('');
-    setNumber('');
-  };
-  // reset = () => {
-  //   this.setState({ name: '', number: '' });
+  // // handleSubmit = e => {
+  // //   e.preventDefault();
+  // //   this.props.onSubmitForm({ ...this.state, id: nanoid() });
+  // //   this.reset();
+  // // };
+  // //
+  // //
+  // //
+  // const reset = () => {
+  //   setName('');
+  //   setNumber('');
   // };
+  // // reset = () => {
+  // //   this.setState({ name: '', number: '' });
+  // // };
 
   return (
     <Form onSubmit={handleSubmit}>
@@ -66,7 +112,7 @@ export const ContactForm = ({ onSubmitForm }) => {
       <FormInput
         type="text"
         name="name"
-        value={name}
+        value={formState.name}
         onChange={handleChange}
         pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
         title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
@@ -77,7 +123,7 @@ export const ContactForm = ({ onSubmitForm }) => {
       <FormInput
         type="tel"
         name="number"
-        value={number}
+        value={formState.number}
         onChange={handleChange}
         pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
         title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
@@ -91,3 +137,4 @@ export const ContactForm = ({ onSubmitForm }) => {
 ContactForm.propTypes = {
   onSubmitForm: PropTypes.func.isRequired,
 };
+export default memo(ContactForm);
